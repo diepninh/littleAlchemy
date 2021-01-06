@@ -1,8 +1,8 @@
 .Drop{
-    background-image: url(../image/backGrDrag.png);
+  background-image: url(../image/backGrDrag.png);
 }
 .word{
-    background-image: url(../image/backGrDrag.png);
-    font-size: 15pt;
-    color: #eed4af;
+  background-image: url(../image/backGrDrag.png);
+  font-size: 15pt;
+  color: #eed4af;
 }

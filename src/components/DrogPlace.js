@@ -18,20 +18,18 @@ export default function DrogPlace() {
     d: { top: 100, left: 100, topStatic: 100, leftStatic: 100, image: 'fire' }
   });
   const [, drop] = useDrop({
-
     accept: ItemTypes.ITEM,
     drop(item, monitor) {
       const delta = monitor.getDifferenceFromInitialOffset();
       const left = Math.round(item.left + delta.x);
       const top = Math.round(item.top + delta.y);
-
       const topStatic = item.topStatic;
       const leftStatic = item.leftStatic;
-
       moveItem(item.id, left, top, topStatic, leftStatic, item.image);
       return undefined;
     }
   });
+//xử lí trùng tạo ra phần tử mới
   const moveItem = (id, left, top, topStatic, leftStatic, image) => {
     const rowObj = { top: topStatic, left: leftStatic, topStatic: topStatic, leftStatic: leftStatic, image: image };
     const newID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
@@ -53,7 +51,6 @@ export default function DrogPlace() {
         update(positions, {
           [id]: {
             $merge: { left, top },
-
           },
           [newID]: { $set: rowObj }
         })
@@ -156,7 +153,6 @@ export default function DrogPlace() {
             setPositions(update(positions, {
               [id]: {
                 $merge: { top: topStatic, left: leftStatic },
-
               },
               [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
               [newID]: { $set: psiObjStatic },
@@ -164,10 +160,10 @@ export default function DrogPlace() {
             }));
             setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'psi' }], $splice: [[i, 1]] }));
             checkCount('psi');
-          };
-        };
-      };
-    };
+          }
+        }
+      }
+    }
   };
   const checkCount = (image) => {
     setDataImage(update(dataImage, { $push: [image] }));
@@ -179,7 +175,6 @@ export default function DrogPlace() {
       }
     }
     setCount(x + 1);
-
   };
 
   return (
@@ -188,11 +183,9 @@ export default function DrogPlace() {
         {Object.keys(positions).map((key) => {
           const { left, top, topStatic, leftStatic, image } = positions[key];
           return (
-
             <ItemDrag key={key} id={key} left={left} top={top} topStatic={topStatic} leftStatic={leftStatic} image={image} ></ItemDrag>
           );
         })}
-
       </div>
       <div style={{ width: 2, background: 'white' }}></div>
       <div className='word'>
@@ -205,9 +198,6 @@ export default function DrogPlace() {
       <div style={{ position: 'absolute', bottom: 10, right: 10 }}>
         <Counter count={count} />
       </div>
-
     </div>
-
-
   );
 }
