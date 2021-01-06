@@ -29,8 +29,26 @@ export default function DrogPlace() {
       return undefined;
     }
   });
-//xử lí trùng tạo ra phần tử mới
+  //xử lí trùng tọa độ
+  const createNewObj = (id, top, left, topStatic, leftStatic, newID, newID2, imageIngre, imageCreateObj, imageCreateObjStatic, imageCreate) => {
+    for (let i = 0; i < oldPositions.length; i++) {
+      if (oldPositions[i].image === imageIngre && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
+        setPositions(update(positions, {
+          [id]: {
+            $merge: { top: topStatic, left: leftStatic },
+          },
+          [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
+          [newID]: { $set: imageCreateObjStatic },
+          [newID2]: { $set: imageCreateObj }
+        }));
+        setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: imageCreate }], $splice: [[i, 1]] }));
+        checkCount(imageCreate);
+      }
+    }
+  }
+  //xử lí trùng tạo ra phần tử mới
   const moveItem = (id, left, top, topStatic, leftStatic, image) => {
+    //khai báo các phần tử tạo trong mảng mới
     const rowObj = { top: topStatic, left: leftStatic, topStatic: topStatic, leftStatic: leftStatic, image: image };
     const newID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const newID2 = Math.random().toString(30).substring(2, 15) + Math.random().toString(30).substring(2, 15);
@@ -42,8 +60,6 @@ export default function DrogPlace() {
     const energyObjStatic = { top: 300, left: 10, topStatic: 300, leftStatic: 10, image: 'energy' };
     const lavaObj = { top, left, topStatic: 300, leftStatic: 100, image: 'lava' };
     const lavaObjStatic = { top: 300, left: 100, topStatic: 300, leftStatic: 100, image: 'lava' };
-    const osibanObj = { top, left, topStatic: 400, leftStatic: 10, image: 'osiban' };
-    const osibanObjStatic = { top: 400, left: 10, topStatic: 400, leftStatic: 10, image: 'osiban' };
     const psiObj = { top, left, topStatic: 400, leftStatic: 100, image: 'psi' };
     const psiObjStatic = { top: 400, left: 100, topStatic: 400, leftStatic: 100, image: 'psi' };
     if (left >= 200) {
@@ -56,112 +72,19 @@ export default function DrogPlace() {
         })
       );
       setOldPositions(update(oldPositions, { $push: [{ id, top, left, topStatic, leftStatic, image }] }));
-
-      if (image === 'water') {
-        for (let i = 0; i < oldPositions.length; i++) {
-          if (oldPositions[i].image === 'fire' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: smokeObjStatic },
-              [newID2]: { $set: smokeObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'steam' }], $splice: [[i, 1]] }));
-            checkCount('steam');
-          }
-          else if (oldPositions[i].image === 'lava' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: osibanObjStatic },
-              [newID2]: { $set: osibanObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'lava' }], $splice: [[i, 1]] }));
-            checkCount('osiban');
-          }
-        }
-      }
-      else if (image === 'air') {
-        for (let i = 0; i < oldPositions.length; i++) {
-          if (oldPositions[i].image === 'earth' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: dushObjStatic },
-              [newID2]: { $set: dushObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'dush' }], $splice: [[i, 1]] }));
-            checkCount('dush');
-          }
-          else if (oldPositions[i].image === 'fire' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: energyObjStatic },
-              [newID2]: { $set: energyObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'energy' }], $splice: [[i, 1]] }));
-            checkCount('energy');
-          }
-        }
-      }
-      else if (image === 'fire') {
-        for (let i = 0; i < oldPositions.length; i++) {
-          if (oldPositions[i].image === 'earth' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: lavaObjStatic },
-              [newID2]: { $set: lavaObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'lava' }], $splice: [[i, 1]] }));
-            checkCount('lava');
-          }
-          else if (oldPositions[i].image === 'water' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: smokeObjStatic },
-              [newID2]: { $set: smokeObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'steam' }], $splice: [[i, 1]] }));
-            checkCount('steam');
-          }
-        }
-      }
-      else if (image === 'earth') {
-        for (let i = 0; i < oldPositions.length; i++) {
-          if (oldPositions[i].image === 'earth' && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
-            setPositions(update(positions, {
-              [id]: {
-                $merge: { top: topStatic, left: leftStatic },
-              },
-              [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
-              [newID]: { $set: psiObjStatic },
-              [newID2]: { $set: psiObj }
-            }));
-            setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: 'psi' }], $splice: [[i, 1]] }));
-            checkCount('psi');
-          }
-        }
+      switch(image){
+        case 'water':
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', smokeObj, smokeObjStatic, 'steam');
+        case 'air':
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', dushObj, dushObjStatic, 'dush');
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', energyObj, energyObjStatic, 'energy');
+        case 'fire':
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', lavaObj, lavaObjStatic, 'lava');
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'water', smokeObj, smokeObjStatic, 'steam');
+        case 'earth':
+          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', psiObj, psiObjStatic, 'psi');
+        default:
+          true
       }
     }
   };
@@ -191,7 +114,7 @@ export default function DrogPlace() {
       <div className='word'>
         {word.map((e) => {
           return (
-            <div key={e} style={{ paddingTop: 13, paddingLeft: 5 }}> {e}</div>
+            <div key={e} style={{ paddingTop: 13, paddingLeft: 5 }}>{e}</div>
           );
         })}
       </div>
