@@ -5,17 +5,20 @@ import { ItemTypes } from '../Constants/Itemtypes.js';
 import update from 'immutability-helper';
 import Counter from './Counter.js';
 import '../styles/DropPlace.css';
+import './Replice.jsx';
+import 'lodash';
 
 export default function DrogPlace() {
   const [oldPositions, setOldPositions] = useState([]);
   const [dataImage, setDataImage] = useState(['air', 'earth', 'water', 'fire']);
   const word = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'];
   const [count, setCount] = useState(4);
+  // a,b,c,d là id của mỗi phần tử , thay đổi vị trí dựa trên id
   const [positions, setPositions] = useState({
-    a: { top: 10, left: 20, topStatic: 10, leftStatic: 20, image: 'air' },
-    b: { top: 10, left: 100, topStatic: 10, leftStatic: 100, image: 'earth' },
-    c: { top: 100, left: 20, topStatic: 100, leftStatic: 20, image: 'water' },
-    d: { top: 100, left: 100, topStatic: 100, leftStatic: 100, image: 'fire' }
+    id_a: { top: 10, left: 20, topStatic: 10, leftStatic: 20, image: 'air' },
+    id_b: { top: 10, left: 100, topStatic: 10, leftStatic: 100, image: 'earth' },
+    id_c: { top: 100, left: 20, topStatic: 100, leftStatic: 20, image: 'water' },
+    id_d: { top: 100, left: 100, topStatic: 100, leftStatic: 100, image: 'fire' }
   });
   const [, drop] = useDrop({
     accept: ItemTypes.ITEM,
@@ -31,17 +34,20 @@ export default function DrogPlace() {
   });
   //xử lí trùng tọa độ
   const createNewObj = (id, top, left, topStatic, leftStatic, newID, newID2, imageIngre, imageCreateObj, imageCreateObjStatic, imageCreate) => {
-    for (let i = 0; i < oldPositions.length; i++) {
-      if (oldPositions[i].image === imageIngre && Math.abs(oldPositions[i].top - top) <= 20 && Math.abs(oldPositions[i].left - left) <= 20) {
+
+    let imagePosi = _.find(oldPositions, { image: imageIngre });
+
+    if (imagePosi !== undefined) {
+      if (Math.abs(imagePosi.top - top) <= 20 && Math.abs(imagePosi.left - left) <= 20) {
         setPositions(update(positions, {
           [id]: {
             $merge: { top: topStatic, left: leftStatic },
           },
-          [oldPositions[i].id]: { $merge: { top: oldPositions[i].topStatic, left: oldPositions[i].leftStatic } },
+          [imagePosi.id]: { $merge: { top: imagePosi.topStatic, left: imagePosi.leftStatic } },
           [newID]: { $set: imageCreateObjStatic },
           [newID2]: { $set: imageCreateObj }
         }));
-        setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: imageCreate }], $splice: [[i, 1]] }));
+        setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: imageCreate }], $splice: [[_.findIndex(oldPositions, { id: imagePosi.id }), 1]] }));
         checkCount(imageCreate);
       }
     }
@@ -72,19 +78,19 @@ export default function DrogPlace() {
         })
       );
       setOldPositions(update(oldPositions, { $push: [{ id, top, left, topStatic, leftStatic, image }] }));
-      switch(image){
-        case 'water':
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', smokeObj, smokeObjStatic, 'steam');
-        case 'air':
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', dushObj, dushObjStatic, 'dush');
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', energyObj, energyObjStatic, 'energy');
-        case 'fire':
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', lavaObj, lavaObjStatic, 'lava');
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'water', smokeObj, smokeObjStatic, 'steam');
-        case 'earth':
-          createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', psiObj, psiObjStatic, 'psi');
-        default:
-          true
+      if (image === 'water') {
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', smokeObj, smokeObjStatic, 'steam');
+      }
+      else if (image === 'air') {
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', dushObj, dushObjStatic, 'dush');
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', energyObj, energyObjStatic, 'energy');
+      }
+      else if (image === 'fire') {
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', lavaObj, lavaObjStatic, 'lava');
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'water', smokeObj, smokeObjStatic, 'steam');
+      }
+      else if (image === 'earth') {
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', psiObj, psiObjStatic, 'psi');
       }
     }
   };
