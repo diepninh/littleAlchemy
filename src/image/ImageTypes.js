@@ -10,4 +10,4 @@ import lava from '../image/lava.png';
 import osiban from '../image/osiban.png';
 import psi from '../image/psi.png';
 
-export   {air , earth , water , fire,steam , dush , energy , lava, osiban, psi};
+export {air , earth , water , fire,steam , dush , energy , lava, osiban, psi};

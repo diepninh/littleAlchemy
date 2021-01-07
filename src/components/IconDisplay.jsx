@@ -1,4 +1,5 @@
 import React from 'react';
+import 'lodash';
 import * as TYPE from '../image/ImageTypes.js';
 
 export  const IconDisplay = ({image}) =>{
@@ -22,7 +23,7 @@ export  const IconDisplay = ({image}) =>{
     case 'osiban':
       return <img src={TYPE.osiban} width={60}  height={60}/>
     case 'psi':
-      return <img src={psi} width={60}  height={60}/>
+      return <img src={TYPE.psi} width={60}  height={60}/>
     default:
       return <div></div>
   }

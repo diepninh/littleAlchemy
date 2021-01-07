@@ -43,8 +43,8 @@ export default function DrogPlace() {
             $merge: { top: topStatic, left: leftStatic },
           },
           [imagePosi.id]: { $merge: { top: imagePosi.topStatic, left: imagePosi.leftStatic } },
-          [newID]: { $set: imageCreateObjStatic },
-          [newID2]: { $set: imageCreateObj }
+          [newID===id ? newID+id : newID]: { $set: imageCreateObjStatic },
+          [newID2===id ? newID2+id : newID2]: { $set: imageCreateObj }
         }));
         setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: imageCreate }], $splice: [[_.findIndex(oldPositions, { id: imagePosi.id }), 1]] }));
         checkCount(imageCreate);
@@ -58,19 +58,19 @@ export default function DrogPlace() {
     //random để tạo id mới
     const newID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const newID2 = Math.random().toString(30).substring(2, 15) + Math.random().toString(30).substring(2, 15);
-
     if (left >= 200) {
       setPositions(
         update(positions, {
           [id]: {
             $merge: { left, top },
           },
-          [newID]: { $set: rowObj }
+          [newID===id ? newID+id : newID]: { $set: rowObj }
         })
       );
       setOldPositions(update(oldPositions, { $push: [{ id, top, left, topStatic, leftStatic, image }] }));
       oldPositions.map((index) => {
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, index.image, Replice(image, index.image, top, left).Obj, Replice(image, index.image, top, left).ObjStatic, Replice(image, index.image, top, left).imageCreate);
+        let recipe = Replice(image, index.image, top, left);
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, index.image,recipe.Obj, recipe.ObjStatic, recipe.imageCreate);
       });
     }
   };

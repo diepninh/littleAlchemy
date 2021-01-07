@@ -10,13 +10,9 @@ export default function ItemDrag({id, left , top  , topStatic , leftStatic , ima
       isDragging: !!monitor.isDragging(),
     })
   });
-     
-    
   return(
-          
     <div ref={drag} style={{ opacity : isDragging ? 0.5 : 1 , fontSize: 25 , fontWeight: 'bold' , cursor:  'move' , left , top, position : 'absolute'}}>
       <IconDisplay image={image}/>
-            
     </div>
   );
 }
