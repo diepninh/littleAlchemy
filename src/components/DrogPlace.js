@@ -5,7 +5,7 @@ import { ItemTypes } from '../Constants/Itemtypes.js';
 import update from 'immutability-helper';
 import Counter from './Counter.js';
 import '../styles/DropPlace.css';
-import './Replice.jsx';
+import { Replice } from './Replice.jsx';
 import 'lodash';
 
 export default function DrogPlace() {
@@ -15,10 +15,10 @@ export default function DrogPlace() {
   const [count, setCount] = useState(4);
   // a,b,c,d là id của mỗi phần tử , thay đổi vị trí dựa trên id
   const [positions, setPositions] = useState({
-    id_a: { top: 10, left: 20, topStatic: 10, leftStatic: 20, image: 'air' },
-    id_b: { top: 10, left: 100, topStatic: 10, leftStatic: 100, image: 'earth' },
-    id_c: { top: 100, left: 20, topStatic: 100, leftStatic: 20, image: 'water' },
-    id_d: { top: 100, left: 100, topStatic: 100, leftStatic: 100, image: 'fire' }
+    id1: { top: 10, left: 20, topStatic: 10, leftStatic: 20, image: 'air' },
+    id2: { top: 10, left: 100, topStatic: 10, leftStatic: 100, image: 'earth' },
+    id3: { top: 100, left: 20, topStatic: 100, leftStatic: 20, image: 'water' },
+    id4: { top: 100, left: 100, topStatic: 100, leftStatic: 100, image: 'fire' }
   });
   const [, drop] = useDrop({
     accept: ItemTypes.ITEM,
@@ -34,7 +34,6 @@ export default function DrogPlace() {
   });
   //xử lí trùng tọa độ
   const createNewObj = (id, top, left, topStatic, leftStatic, newID, newID2, imageIngre, imageCreateObj, imageCreateObjStatic, imageCreate) => {
-
     let imagePosi = _.find(oldPositions, { image: imageIngre });
 
     if (imagePosi !== undefined) {
@@ -51,23 +50,15 @@ export default function DrogPlace() {
         checkCount(imageCreate);
       }
     }
-  }
+  };
   //xử lí trùng tạo ra phần tử mới
   const moveItem = (id, left, top, topStatic, leftStatic, image) => {
-    //khai báo các phần tử tạo trong mảng mới
+    //Tao phần tử y hệt phần tử cũ
     const rowObj = { top: topStatic, left: leftStatic, topStatic: topStatic, leftStatic: leftStatic, image: image };
+    //random để tạo id mới
     const newID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
     const newID2 = Math.random().toString(30).substring(2, 15) + Math.random().toString(30).substring(2, 15);
-    const smokeObj = { top: top, left: left, topStatic: 200, leftStatic: 10, image: 'steam' };
-    const smokeObjStatic = { top: 200, left: 10, topStatic: 200, leftStatic: 10, image: 'steam' };
-    const dushObj = { top, left, topStatic: 200, leftStatic: 100, image: 'dush' };
-    const dushObjStatic = { top: 200, left: 100, topStatic: 200, leftStatic: 100, image: 'dush' };
-    const energyObj = { top, left, topStatic: 300, leftStatic: 10, image: 'energy' };
-    const energyObjStatic = { top: 300, left: 10, topStatic: 300, leftStatic: 10, image: 'energy' };
-    const lavaObj = { top, left, topStatic: 300, leftStatic: 100, image: 'lava' };
-    const lavaObjStatic = { top: 300, left: 100, topStatic: 300, leftStatic: 100, image: 'lava' };
-    const psiObj = { top, left, topStatic: 400, leftStatic: 100, image: 'psi' };
-    const psiObjStatic = { top: 400, left: 100, topStatic: 400, leftStatic: 100, image: 'psi' };
+
     if (left >= 200) {
       setPositions(
         update(positions, {
@@ -78,22 +69,12 @@ export default function DrogPlace() {
         })
       );
       setOldPositions(update(oldPositions, { $push: [{ id, top, left, topStatic, leftStatic, image }] }));
-      if (image === 'water') {
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', smokeObj, smokeObjStatic, 'steam');
-      }
-      else if (image === 'air') {
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', dushObj, dushObjStatic, 'dush');
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', energyObj, energyObjStatic, 'energy');
-      }
-      else if (image === 'fire') {
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', lavaObj, lavaObjStatic, 'lava');
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'water', smokeObj, smokeObjStatic, 'steam');
-      }
-      else if (image === 'earth') {
-        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', psiObj, psiObjStatic, 'psi');
-      }
+      oldPositions.map((index) => {
+        createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, index.image, Replice(image, index.image, top, left).Obj, Replice(image, index.image, top, left).ObjStatic, Replice(image, index.image, top, left).imageCreate);
+      });
     }
   };
+  //Đếm số đối tượng có trong bảng.
   const checkCount = (image) => {
     setDataImage(update(dataImage, { $push: [image] }));
     let x = 0;
