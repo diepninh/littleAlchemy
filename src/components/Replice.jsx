@@ -1,29 +1,13 @@
-//xử lí trùng tọa độ
-const createNewObj = (id, top, left, topStatic, leftStatic, newID, newID2, imageIngre, imageCreateObj, imageCreateObjStatic, imageCreate) => {
 
-  let imagePosi = _.find(oldPositions, { image: imageIngre });
-
-  if (imagePosi !== undefined) {
-    if (Math.abs(imagePosi.top - top) <= 20 && Math.abs(imagePosi.left - left) <= 20) {
-      setPositions(update(positions, {
-        [id]: {
-          $merge: { top: topStatic, left: leftStatic },
-        },
-        [imagePosi.id]: { $merge: { top: imagePosi.topStatic, left: imagePosi.leftStatic } },
-        [newID]: { $set: imageCreateObjStatic },
-        [newID2]: { $set: imageCreateObj }
-      }));
-      setOldPositions(update(oldPositions, { $push: [{ newID2, top, left, topStatic, leftStatic, image: imageCreate }], $splice: [[_.findIndex(oldPositions, { id: imagePosi.id }), 1]] }));
-      checkCount(imageCreate);
-    }
-  }
-}
-//xử lí trùng tạo ra phần tử mới
-const moveItem = (id, left, top, topStatic, leftStatic, image) => {
-  //khai báo các phần tử tạo trong mảng mới
-  const rowObj = { top: topStatic, left: leftStatic, topStatic: topStatic, leftStatic: leftStatic, image: image };
-  const newID = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-  const newID2 = Math.random().toString(30).substring(2, 15) + Math.random().toString(30).substring(2, 15);
+export const Replice = (image, imageIngre, top, left) => {
+  const waterObj = { top , left ,  topStatic: 100, leftStatic: 20, image: 'water'};
+  const waterObjStatic = { top: 100 , left: 20 ,  topStatic: 100, leftStatic: 20, image: 'water'};
+  const airObj = { top , left ,  topStatic: 10, leftStatic: 20, image: 'air'};
+  const airObjStatic = { top: 10 , left: 20 ,  topStatic: 10, leftStatic: 20, image: 'air'};
+  const fireObj = { top , left ,  topStatic: 100, leftStatic: 100, image: 'fire'};
+  const fireObjStatic = { top: 100 , left: 100 ,  topStatic: 100, leftStatic: 100, image: 'fire'};
+  const earthObj = { top , left ,  topStatic: 100, leftStatic: 20, image: 'earth'};
+  const earthObjStatic = { top: 100 , left: 100 ,  topStatic: 100, leftStatic: 100, image: 'earth'};
   const smokeObj = { top: top, left: left, topStatic: 200, leftStatic: 10, image: 'steam' };
   const smokeObjStatic = { top: 200, left: 10, topStatic: 200, leftStatic: 10, image: 'steam' };
   const dushObj = { top, left, topStatic: 200, leftStatic: 100, image: 'dush' };
@@ -34,40 +18,41 @@ const moveItem = (id, left, top, topStatic, leftStatic, image) => {
   const lavaObjStatic = { top: 300, left: 100, topStatic: 300, leftStatic: 100, image: 'lava' };
   const psiObj = { top, left, topStatic: 400, leftStatic: 100, image: 'psi' };
   const psiObjStatic = { top: 400, left: 100, topStatic: 400, leftStatic: 100, image: 'psi' };
-  if (left >= 200) {
-    setPositions(
-      update(positions, {
-        [id]: {
-          $merge: { left, top },
-        },
-        [newID]: { $set: rowObj }
-      })
-    );
-    setOldPositions(update(oldPositions, { $push: [{ id, top, left, topStatic, leftStatic, image }] }));
-    if (image === 'water') {
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', smokeObj, smokeObjStatic, 'steam');
-    }
-    else if (image === 'air') {
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', dushObj, dushObjStatic, 'dush');
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'fire', energyObj, energyObjStatic, 'energy');
-    }
-    else if (image === 'fire') {
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', lavaObj, lavaObjStatic, 'lava');
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'water', smokeObj, smokeObjStatic, 'steam');
-    }
-    else if (image === 'earth') {
-      createNewObj(id, top, left, topStatic, leftStatic, newID, newID2, 'earth', psiObj, psiObjStatic, 'psi');
-    }
+
+  switch(image){
+    case 'water':
+      switch(imageIngre){
+        case 'fire':
+          return { ObjStatic : smokeObjStatic, Obj : smokeObj , imageCreate: 'steam'};
+        default :
+          return { ObjStatic : waterObjStatic, Obj : waterObj , imageCreate: 'water'};
+      }
+    case 'air':
+      switch(imageIngre){
+        case 'fire':
+          return { ObjStatic : energyObjStatic, Obj : energyObj , imageCreate: 'energy'};
+        case 'earth':
+          return { ObjStatic : dushObjStatic, Obj : dushObj , imageCreate: 'dush'};
+        default :
+          return { ObjStatic : airObjStatic, Obj : airObj , imageCreate: 'air'};
+      }
+    case 'fire':
+      switch(imageIngre){
+        case 'fire':
+          return { ObjStatic : smokeObjStatic, Obj : smokeObj , imageCreate: 'steam'};
+        case 'earth':
+          return { ObjStatic : lavaObjStatic, Obj : lavaObj , imageCreate: 'lava'};
+        default :
+          return { ObjStatic : fireObjStatic, Obj : fireObj , imageCreate: 'fire'};
+      }
+    case 'earth':
+      switch(imageIngre){
+        case 'earth':
+          return { ObjStatic : psiObjStatic, Obj : psiObj , imageCreate: 'psi'};
+        default :
+          return { ObjStatic : earthObjStatic, Obj : earthObj , imageCreate: 'earth'};
+      }
+    default:
+      return { ObjStatic : '', Obj :  '' , imageCreate: ''};
   }
-};
-const checkCount = (image) => {
-  setDataImage(update(dataImage, { $push: [image] }));
-  let x = 0;
-  let Arr = [...new Set(dataImage)];
-  for (let i = 0; i < Arr.length; i++) {
-    if (image !== Arr[i]) {
-      x++;
-    }
-  }
-  setCount(x + 1);
-};
+}
